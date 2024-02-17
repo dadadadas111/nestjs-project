@@ -1,20 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus, UseGuards, UseFilters } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/roles/role.decorator';
 import { FirebaseAuthGuard } from 'src/firebase-auth/firebase-auth.guard';
+import { AllExceptionsFilter } from 'src/all-exception-filter/all-exception-filter.filter';
 
 @Controller('cats')
-@UseGuards(AuthGuard)
-@UseGuards(FirebaseAuthGuard)
+//@UseGuards(AuthGuard)
+@UseFilters(AllExceptionsFilter)
+
 
 export class CatsController {
   constructor(private readonly catsService: CatsService) { }
 
   @Post()
   @Roles(['admin', 'user0'])
+  @UseGuards(FirebaseAuthGuard)
   create(@Body() createCatDto: CreateCatDto) {
     return this.catsService.create(createCatDto);
   }
